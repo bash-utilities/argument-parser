@@ -1,0 +1,3 @@
+[submodule "shared_functions/argument_parser"]
+	path = shared_functions/argument_parser
+	url = https://github.com/S0AndS0/Bash_Argument_Parser.git
