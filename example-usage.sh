@@ -34,7 +34,7 @@ _passed_args=("${@:?No arguments provided}")
 _acceptable_args=(
     '--help|-h:bool'
     '--directory-path|-d:path'
-    '--file-name|-f:print-nil'
+    '--file-name:print-nil'
 )
 
 ## Pass arrays by reference/name to the `argument_parser` function
@@ -51,13 +51,13 @@ Augments script responds to
 
     Prints this message and exits
 
---file-name  | -f
-
-    Example argument that may print ${_file_name:-a file name}
-
 --directory-path
 
     Example augment for paths such as ${_directory_path:-/tmp}
+
+<file-name>
+
+    Example argument that may print ${_file_name:-a file name}
 EOF
     exit "${_exit_status:-0}"
 fi
