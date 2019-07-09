@@ -13,7 +13,6 @@ This repository is intended as a `git submodule` for other Bash scripts that'd b
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Example Usage](#example-usage)
-- [Support](#support)
 - [License](#license)
 
 
@@ -125,17 +124,6 @@ git pull
 
 
 > ... to re-attach the submodule's `HEAD` once again.
-
-
-Tip, to make `merge` and `remote` the default for `git submodule update` commands...
-
-
-```bash
-git config -f .gitmodules submodule.${_destination}.update 'merge,remote'
-```
-
-
-... which'll also ensure those cloning your project are working from the latest revision of this project.
 
 
 ## Example Usage
@@ -258,20 +246,6 @@ _acceptable_args=(
 
 
 ... would set _`_source_path`_ and _`_destination_path`_ variables in that order if no option names where provided
-
-
-## Support
-
-
-Open a new _`Issue`_ (or up-vote currently opened <sub>[![Issues][badge__issues]][relative_link__issues]</sub> if similar) to report bugs and/or make feature requests a higher priority for project maintainers. Submit _`Pull Requests`_ after _`Forking`_ this repository to add features or fix bugs, and be counted among this project's <sub>[![Members][badge__contributors]][relative_link__members]</sub>
-
-
-> See GitHub's documentation on [Forking][help_fork] and issuing [Pull Requests][help_pull_request] if these are new terms.
->
-> And check the chapter regarding [submodules][git_book__submodules] from the Git book prior to opening issues regarding submodule _trouble-shooting_
-
-
-Supporting projects like this one through <sub>[![Liberapay][badge__liberapay]][liberapay_donate]</sub> or via Bitcoin <sub>[![BTC][badge__bitcoin]][btc]</sub> is most welcomed, and encourages projects like these to remain free of advertising.
 
 
 ## License
