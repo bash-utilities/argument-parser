@@ -46,28 +46,15 @@ By adding one of the available `clone` URLs to a current project...
 
 
 ```bash
-_url='git@github.com:S0AndS0/Bash_Argument_Parser.git'
-_dir='modules/Bash_Argument_Parser'
+_url='https://github.com/bash-utilities/argument-parser.git'
+_dir='modules/argument-parser'
 
 cd your-project
-git submodule add -b master "${_url}" "${_dir}"
+git submodule add -b master --name argument-parser "${_url}" "${_dir}"
 ```
 
 
-Or by adding to a new project...
-
-
-```bash
-_url='https://github.com/S0AndS0/Bash_Argument_Parser.git'
-
-mkdir -vp new-project
-cd new-project
-git init .
-git submodule add -b master "${_url}" "${_dir}"
-```
-
-
-> Older versions of `git` may require the following to populate `${_dir}`...
+> Note, older versions of `git` may require the following to populate `${_dir}`...
 
 
 ```bash
@@ -87,7 +74,7 @@ Changes to be committed:
   (use "git rm --cached <file>..." to unstage)
 
 	new file:   .gitmodules
-	new file:   modules/Bash_Argument_Parser
+	new file:   modules/argument-parser
 ```
 
 
@@ -107,16 +94,13 @@ git submodule update --merge
 
 
 ```bash
-cd modules/Bash_Argument_Parser
+cd modules/argument-parser
 git checkout master
 git pull
 ```
 
 
 > ... to re-attach the submodule's `HEAD` once again.
-
-
-> Tip, `git submodule update --remote --merge` will _`pull`_ in changes directly from this repository regardless of `hash` currently tracked within another project.
 
 
 ## Example Usage
@@ -126,16 +110,16 @@ git pull
 #!/usr/bin/env bash
 
 
-## Optional, but recommended to find true directory this script resides in
-# __SOURCE__="${BASH_SOURCE[0]}"
-# while [[ -h "${__SOURCE__}" ]]; do
-#     __SOURCE__="$(find "${__SOURCE__}" -type l -ls | sed -n 's@^.* -> \(.*\)@\1@p')"
-# done
-# __DIR__="$(cd -P "$(dirname "${__SOURCE__}")" && pwd)"
+## Find true directory this script resides in
+__SOURCE__="${BASH_SOURCE[0]}"
+while [[ -h "${__SOURCE__}" ]]; do
+    __SOURCE__="$(find "${__SOURCE__}" -type l -ls | sed -n 's@^.* -> \(.*\)@\1@p')"
+done
+__DIR__="$(cd -P "$(dirname "${__SOURCE__}")" && pwd)"
 
 
 ## Source module code within this script
-source "${__DIR__}/modules/Bash_Argument_Parser/argument_parser.sh"
+source "${__DIR__}/modules/argument-parser/argument-parser.sh"
 
 
 ## Save passed arguments and acceptable arguments to Bash arrays
@@ -220,23 +204,15 @@ Open a new _`Issue`_ (or up-vote currently opened <sub>[![Issues][badge__issues]
 > See GitHub's documentation on [Forking][help_fork] and issuing [Pull Requests][help_pull_request] if these are new terms.
 
 
-Supporting projects like this one through <sub>[![Liberapay][badge__liberapay]][liberapay_donate]</sub> or via Bitcoin <sub>[![BTC][badge__bitcoin]][btc]</sub> is most welcomed, and encourages projects like these to remain free of advertising.
-
-
 
 [relative_link__issues]: issues
 [relative_link__members]: network/members
 
 
-[badge__issues]: https://img.shields.io/github/issues/S0AndS0/Jekyll_Admin.svg
-[badge__members]: https://img.shields.io/github/forks/S0AndS0/Jekyll_Admin.svg?color=005571&label=members
+[badge__issues]: https://img.shields.io/github/issues/bash-utilities/argument-parser.svg
+[badge__members]: https://img.shields.io/github/forks/bash-utilities/argument-parser.svg?color=005571&label=members
 
-[badge__liberapay]: https://img.shields.io/badge/Liberapay-gray.svg?logo=liberapay
-[badge__bitcoin]: https://img.shields.io/badge/1Dr9KYZz9jkUea5xTxeGyScu7AwC4MwR5c-gray.svg?logo=bitcoin
 
 
 [help_fork]: https://help.github.com/en/articles/fork-a-repo
 [help_pull_request]: https://help.github.com/en/articles/about-pull-requests
-
-[liberapay_donate]: https://liberapay.com/S0AndS0/donate
-[btc]: https://www.blockchain.com/btc/address/1Dr9KYZz9jkUea5xTxeGyScu7AwC4MwR5c
