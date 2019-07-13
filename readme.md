@@ -1,4 +1,7 @@
-## Bash Argument Parser
+# Bash Argument Parser
+[heading__title]:
+  #bash-argument-parser
+  "&#x2B06; Top of ReadMe File"
 
 
 This repository is intended as a `git submodule` for other Bash scripts that'd be _fancier_ if they'd parse arguments.
@@ -10,10 +13,18 @@ This repository is intended as a `git submodule` for other Bash scripts that'd b
 #### Table of Contents
 
 
+- [&#x2B06; Top of ReadMe File][heading__title]
+
 - [Requirements](#requirements)
-- [Installation](#installation)
-- [Example Usage](#example-usage)
-- [Support](#support)
+
+- [&#9889; Quick Start][heading__quick_start]
+
+  - [Edit Your ReadMe File][heading__your_readme_file]
+  - [Utilize Argument Parser][heading__utilize_submodule]
+  - [Commit and Push][heading__commit_and_push]
+
+- [&#x2696; License][license]
+
 
 
 ------
@@ -39,71 +50,62 @@ Bash version 4 or greater and the following command line utilities;
 > See `info printf` and `info sed` for documentation and `help declare` and `help local` for more information on additional options.
 
 
-## Installation
+## Quick Start
+[heading__quick_start]:
+  #quick-start
+  "&#9889; Perhaps as easy as one, 2.0,..."
+
+**Bash Variables**
 
 
-By adding one of the available `clone` URLs to a current project...
-
-
-```bash
-_url='https://github.com/bash-utilities/argument-parser.git'
-_dir='modules/argument-parser'
-
-cd your-project
-git submodule add -b master --name argument-parser "${_url}" "${_dir}"
+```Bash
+_module_https_url='https://github.com/bash-utilities/argument-parser.git'
+_module_relative_path='modules/argument-parser'
 ```
 
 
-> Note, older versions of `git` may require the following to populate `${_dir}`...
+**Bash Submodule Commands**
 
 
-```bash
-git submodule update --init --recursive
+```Bash
+cd "<your-git-project-path>"
+
+git checkout gh-pages
+mkdir -vp "modules"
+
+git submodule add -b master --name argument-parser "${_module_https_url}" "${_module_relative_path}"
 ```
 
 
-Check that something similar to the following results from `git status`...
+### Your ReadMe File
+[heading__your_readme_file]:
+  #your-readme-file
+  "Suggested additions for your ReadMe.md file so everyone has a good time with submodules"
 
 
-```git
-On branch master
+> **Your Quick Start Section**
 
-Initial commit
 
-Changes to be committed:
-  (use "git rm --cached <file>..." to unstage)
+```MarkDown
+Clone with the following to avoid incomplete downloads
 
-	new file:   .gitmodules
-	new file:   modules/argument-parser
+
+
+    git clone --recurse-submodules <url-for-your-project>
+
+
+Update/upgrade submodules via
+
+
+    git submodule update --init --recursive
+    git submodule update --merge
 ```
 
 
-... `commit` and `push` these changes then notify anyone contributing to your project that...
-
-
-```bash
-git submodule update --init --recursive
-git submodule update --merge
-```
-
-
-... commands may be useful for updating.
-
-
-> Note, if at any point in the future `git submodule foreach git status` reports a detached `HEAD`, and that is somehow bothersome then try...
-
-
-```bash
-cd modules/argument-parser
-git checkout master
-git pull
-```
-
-
-> ... to re-attach the submodule's `HEAD` once again.
-
-
-## Example Usage
+### Utilize Argument Parser
+[heading__utilize_submodule]:
+  #utilize-argument-parser
+  "How to make use of this submodule within another project"
 
 
 ```bash
@@ -126,8 +128,8 @@ source "${__DIR__}/modules/argument-parser/argument-parser.sh"
 _passed_args=("${@:?No arguments provided}")
 _acceptable_args=(
     '--help|-h:bool'
-    '--file-name|-f:print-nil'
-    '--directory-path:path'
+    '--directory-path|-d:path'
+    '--file-name:print-nil'
 )
 
 ## Pass arrays by reference/name to the `argument_parser` function
@@ -144,26 +146,26 @@ Augments script responds to
 
     Prints this message and exits
 
---file-name  | -f
-
-    Example argument that may print ${_file_name:-a file name}
-
 --directory-path
 
     Example augment for paths such as ${_directory_path:-/tmp}
+
+<file-name>
+
+    Example argument that may print ${_file_name:-a file name}
 EOF
     exit "${_exit_status:-0}"
 fi
 
 
-## Do scripted things with passed arguments, however, do remember to check
-##  if required values are set and either throw an error or default
-printf '_directory_path -> %s\n' "${_directory_path:?--path not provided}"
+## Do scripted things with passed arguments, however, remember to check if
+##  required values are not set and either throw an error or set a default
+printf '_directory_path -> %s\n' "${_directory_path:?--directory-path not provided}"
 printf '_file_name  -> %s\n' "${_file_name:-output.log}"
 ```
 
 
-Arguments such as _`--file-name`_ are _transmuted_ into variable names like _`_file_name`_, and short options may be listed with pipes (`|`) as a separator; eg. _`--file-name|-f|--fname|-n`_ would match and set the _`_file_name`_ variable for `-f`, `-n`, or `--fname`, etc. The first option listed will become the variable name, thus it's a _good idea_ to list the long option first, eg. _`-f|--file-name`_ would be a _bad idea_ as that would set a variable named _`_f`_... a nightmare to debug.
+Arguments such as _`--file-name`_ are _transmuted_ into variable names like _`_file_name`_, and short options may be listed with pipes (`|`) as a separator; eg. _`--directory-path|-d|--dpath`_ would match and set the _`_directory_path`_ variable for `-d`, or `--dpath`, etc. The first option listed will become the variable name, thus it's a _good idea_ to list the long option first, eg. _`-d|--directory-path`_ would be a _bad idea_ as that would set a variable named _`_d`_... a nightmare to debug.
 
 
 Available argument parsing _types_ are
@@ -186,33 +188,91 @@ Available argument parsing _types_ are
 - `:alpha_numeric` _scrubs_ any non-alphanumeric characters from passed value
 
 
-These are intended for catching or forgiving typos, and should not be considered secure in untrusted and/or hostile environments.
-
-
-The `-nil` _modifier_ may be appended to any but `:bool` option _types_ to make an argument option optional, eg. _`--file-name`_ from the above [example](#example-usage) script will also set from something like _`script-name.sh --directory-path=/tmp file-name.ext`_ meaning that the `--file-name` option was _assumed_ to prefix the _`file-name.ext`_ value.
-
-
 > Note, `:list` does **not** set an array but instead a string that contains the most common list separators, in the future an `:array` _type_ might be added to set a Bash arrays too.
 
 
-## Support
+These are intended for catching or forgiving typos, and should not be considered secure in untrusted and/or hostile environments.
 
 
-Open a new _`Issue`_ (or up-vote currently opened <sub>[![Issues][badge__issues]][relative_link__issues]</sub> if similar) to report bugs and/or make feature requests a higher priority for project maintainers. Submit _`Pull Requests`_ after _`Forking`_ this repository to add features or fix bugs, and be counted among this project's contributing <sub>[![Members][badge__members]][relative_link__members]</sub>
+The `-nil` _modifier_ may be appended to any but `:bool` option _types_ to make an argument _greedy_, eg. _`--file-name`_ from the above [example](#example-usage) script will also set from something like _`script-name.sh --directory-path=/tmp file-name.ext`_ meaning that the `--file-name` option was _assumed_ to prefix the _`file-name.ext`_ value.
 
 
-> See GitHub's documentation on [Forking][help_fork] and issuing [Pull Requests][help_pull_request] if these are new terms.
+One warning regarding the `-nil` _modifier_, place argument options using `-nil` at the end/bottom of the `_acceptable_args` Bash array, eg...
+
+
+```bash
+_acceptable_args=(
+    '--help|-h:bool'
+    '--file-name|-f:print-nil'
+    '--directory-path|-d:path'
+)
+```
+
+
+... would be lead to a _bad time_ when attempting to use the values within _`_file_name`_ and _`_directory_path`_ variables.
+
+
+Multiple `-nil` modified options maybe _stacked_, eg...
+
+
+```bash
+_acceptable_args=(
+    '--help|-h:bool'
+    '--source-path|-s:path-nil'
+    '--destination-path|-d:path-nil'
+)
+```
+
+
+### Commit and Push
+[heading__commit_and_push]:
+  #commit-and-push
+  "It may be just this easy..."
+
+
+```Bash
+git add .gitmodules
+git add modules/argument-parser
+
+
+## Add any changed files too
+
+
+git commit -F- <<'EOF'
+Submodule `bash-utilities/argument-parser` added for argument parsing
+
+
+## Add anything else of note...
+EOF
+
+
+git push origin gh-pages
+```
+
+
+___
 
 
 
-[relative_link__issues]: issues
-[relative_link__members]: network/members
+## License
+[license]:
+  #license
+  "&#x2696; Legal bits of Open Source software"
 
 
-[badge__issues]: https://img.shields.io/github/issues/bash-utilities/argument-parser.svg
-[badge__members]: https://img.shields.io/github/forks/bash-utilities/argument-parser.svg?color=005571&label=members
+```
+Argument Parser documentation from Bash Utilities
+Copyright (C) 2019  S0AndS0
 
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation; version 3 of the License.
 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-[help_fork]: https://help.github.com/en/articles/fork-a-repo
-[help_pull_request]: https://help.github.com/en/articles/about-pull-requests
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+```
