@@ -24,14 +24,18 @@ _TRUE='1'
 _DEFAULT_ACCEPTABLE_ARG_LIST=('--help|-h:bool' '--foo|-f:print' '--path:path-nil')
 
 
-arg_scrubber_alpha_numeric(){ printf '%s' "${@//[^a-z0-9A-Z]/}"; }
-
-
-arg_scrubber_regex(){ printf '%s' "$(sed 's@.@\\.@g' <<<"${@//[^[:print:]$'\t'$'\n']/}")"; }
+arg_scrubber_alpha_numeric(){
+  printf '%s' "${@//[^a-z0-9A-Z]/}"
+}
 
 
 arg_scrubber_list(){
     printf '%s' "$(sed 's@\.\.*@.@g; s@--*@-@g' <<<"${@//[^a-z0-9A-Z,+_./@:-]/}")"
+}
+
+
+arg_scrubber_number(){
+  printf '%s\n' "$(sed 's@\.\.*@.@g; s@--*@-@g' <<<"${@//[^0-9]/}")"
 }
 
 
@@ -47,18 +51,24 @@ arg_scrubber_posix(){
 }
 
 
+arg_scrubber_regex(){
+  printf '%s' "$(sed 's@.@\\.@g' <<<"${@//[^[:print:]$'\t'$'\n']/}")"
+}
+
+
 return_scrubbed_arg(){
     _raw_value="${1}"
     _opt_type="${2:?## Error - no option type provided to return_scrubbed_arg}"
     case "${_opt_type}" in
-        'bool'*)  _value="${_TRUE}"      ;;
-        'raw'*)   _value="${_raw_value}" ;;
-        'path'*)  _value="$(arg_scrubber_path "${_raw_value}")"  ;;
-        'posix'*) _value="$(arg_scrubber_posix "${_raw_value}")" ;;
-        'print'*) _value="${_raw_value//[^[:print:]]/}"          ;;
-        'regex'*) _value="$(arg_scrubber_regex "${_raw_value}")" ;;
-        'list'*)  _value="$(arg_scrubber_list "${_raw_value}")"  ;;
         'alpha_numeric'*) _value="$(arg_scrubber_alpha_numeric "${_raw_value}")" ;;
+        'bool'*)          _value="${_TRUE}"                                      ;;
+        'list'*)          _value="$(arg_scrubber_list "${_raw_value}")"          ;;
+        'number'*)        _value="$(arg_scrubber_number "${_raw_value}")"        ;;
+        'path'*)          _value="$(arg_scrubber_path "${_raw_value}")"          ;;
+        'posix'*)         _value="$(arg_scrubber_posix "${_raw_value}")"         ;;
+        'print'*)         _value="${_raw_value//[^[:print:]]/}"                  ;;
+        'raw'*)           _value="${_raw_value}"                                 ;;
+        'regex'*)         _value="$(arg_scrubber_regex "${_raw_value}")"         ;;
     esac
 
     if [[ "${_opt_type}" =~ ^'bool'* ]] || [[ "${_raw_value}" == "${_value}" ]]; then
