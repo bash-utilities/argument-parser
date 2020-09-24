@@ -26,7 +26,7 @@ __DIR__="$(cd -P "$(dirname "${__SOURCE__}")" && pwd)"
 
 
 ## Source module code within this script
-source "${__DIR__}/shared_functions/argument_parser/argument_parser.sh"
+source "${__DIR__}/shared_functions/argument_parser/argument-parser.sh"
 
 
 ## Save passed arguments and acceptable arguments to Bash arrays
