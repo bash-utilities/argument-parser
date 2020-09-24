@@ -70,7 +70,6 @@ _module_relative_path='modules/argument-parser'
 ```Bash
 cd "<your-git-project-path>"
 
-git checkout gh-pages
 mkdir -vp "modules"
 
 git submodule add -b master --name argument-parser "${_module_https_url}" "${_module_relative_path}"
