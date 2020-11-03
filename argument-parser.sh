@@ -25,7 +25,7 @@ _DEFAULT_ACCEPTABLE_ARG_LIST=('--help|-h:bool' '--foo|-f:print' '--path:path-nil
 
 
 arg_scrubber_alpha_numeric(){
-  printf '%s' "${@//[^a-z0-9A-Z]/}"
+    printf '%s' "${@//[^a-z0-9A-Z]/}"
 }
 
 
@@ -35,7 +35,7 @@ arg_scrubber_list(){
 
 
 arg_scrubber_number(){
-  printf '%s\n' "$(sed 's@\.\.*@.@g; s@--*@-@g' <<<"${@//[^0-9]/}")"
+    printf '%s\n' "$(sed 's@\.\.*@.@g; s@--*@-@g' <<<"${@//[^0-9.-]/}")"
 }
 
 
@@ -52,7 +52,7 @@ arg_scrubber_posix(){
 
 
 arg_scrubber_regex(){
-  printf '%s' "$(sed 's@.@\\.@g' <<<"${@//[^[:print:]$'\t'$'\n']/}")"
+    printf '%s' "$(sed 's@.@\\.@g' <<<"${@//[^[:print:]$'\t'$'\n']/}")"
 }
 
 
