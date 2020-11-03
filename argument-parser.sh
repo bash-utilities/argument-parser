@@ -45,7 +45,7 @@ arg_scrubber_path(){
 
 
 arg_scrubber_posix(){
-    _value="${@//[^a-z0-9A-Z_.-]/}"
+    local _value="${@//[^a-z0-9A-Z_.-]/}"
     _value="$(sed 's@^[-_.]@@g; s@[-_.]$@@g; s@\.\.*@.@g; s@--*@-@g' <<<"${_value}")"
     printf '%s' "${_value::32}"
 }
@@ -57,8 +57,9 @@ arg_scrubber_regex(){
 
 
 return_scrubbed_arg(){
-    _raw_value="${1}"
-    _opt_type="${2:?## Error - no option type provided to return_scrubbed_arg}"
+    local _raw_value="${1}"
+    local _opt_type="${2:?## Error - no option type provided to return_scrubbed_arg}"
+    local _value
     case "${_opt_type}" in
         'alpha_numeric'*) _value="$(arg_scrubber_alpha_numeric "${_raw_value}")" ;;
         'bool'*)          _value="${_TRUE}"                                      ;;
@@ -83,55 +84,55 @@ return_scrubbed_arg(){
 argument_parser(){
     local -n _arg_user_ref="${1:?# No reference to an argument list/array provided}"
     local -n _arg_accept_ref="${2:-_DEFAULT_ACCEPTABLE_ARG_LIST}"
-    _args_user_list=("${_arg_user_ref[@]}")
+    local _args_user_list=( "${_arg_user_ref[@]}" )
     unset _assigned_args
     for _acceptable_args in ${_arg_accept_ref[@]}; do
         ## Take a break when user supplied argument list becomes empty
         [[ "${#_args_user_list[@]}" == '0' ]] && break
         ## First in listed acceptable arg is used as variable name to save value to
         ##  example, '--foo-bar fizz' would transmute into '_foo_bar=fizz'
-        _opt_name="${_acceptable_args%%[:|]*}"
-        _var_name="${_opt_name#*[-]}"
+        local _opt_name="${_acceptable_args%%[:|]*}"
+        local _var_name="${_opt_name#*[-]}"
         _var_name="${_var_name#*[-]}"
         _var_name="_${_var_name//-/_}"
         ## Divine the type of argument allowed for this iteration of acceptable args
         case "${_acceptable_args}" in
-            *':'*) _opt_type="${_acceptable_args##*[:]}" ;;
-            *)     _opt_type="bool"                      ;;
+            *':'*) local _opt_type="${_acceptable_args##*[:]}" ;;
+            *)     local _opt_type="bool"                      ;;
         esac
         ## Set case expressions to match user arguments against and for non-bool type
         ##  what alternative case expression to match on.
         ##  example '--foo|-f' will also check for '--foo=*|-f=*'
-        _arg_opt_list="${_acceptable_args%%:*}"
-        _valid_opts_pattern="@(${_arg_opt_list})"
+        local _arg_opt_list="${_acceptable_args%%:*}"
+        local _valid_opts_pattern="@(${_arg_opt_list})"
         case "${_arg_opt_list}" in
-            *'|'*) _valid_opts_pattern_alt="@(${_arg_opt_list//|/=*|}=*)" ;;
-            *)     _valid_opts_pattern_alt="@(${_arg_opt_list}=*)"        ;;
+            *'|'*) local _valid_opts_pattern_alt="@(${_arg_opt_list//|/=*|}=*)" ;;
+            *)     local _valid_opts_pattern_alt="@(${_arg_opt_list}=*)"        ;;
         esac
         ## Attempt to match up user supplied arguments with those that are valid
         for (( i = 0; i < "${#_args_user_list[@]}"; i++ )); do
-            _user_opt="${_args_user_list[${i}]}"
+            local _user_opt="${_args_user_list[${i}]}"
             case "${_user_opt}" in
                 ${_valid_opts_pattern})     ## Parse for script-name --foo bar or --true
                     if [[ "${_opt_type}" =~ ^'bool'* ]]; then
-                        _var_value="$(return_scrubbed_arg "${_user_opt}" "${_opt_type}")"
-                        _exit_status="${?}"
+                        local _var_value="$(return_scrubbed_arg "${_user_opt}" "${_opt_type}")"
+                        local _exit_status="${?}"
                     else
                         i+=1
-                        _var_value="$(return_scrubbed_arg "${_args_user_list[${i}]}" "${_opt_type}")"
-                        _exit_status="${?}"
+                        local _var_value="$(return_scrubbed_arg "${_args_user_list[${i}]}" "${_opt_type}")"
+                        local _exit_status="${?}"
                         unset _args_user_list[$(( i - 1 ))]
                     fi
                 ;;
                 ${_valid_opts_pattern_alt}) ## Parse for script-name --foo=bar
-                    _var_value="$(return_scrubbed_arg "${_user_opt#*=}" "${_opt_type}")"
-                    _exit_status="${?}"
+                    local _var_value="$(return_scrubbed_arg "${_user_opt#*=}" "${_opt_type}")"
+                    local _exit_status="${?}"
                 ;;
                 *)                          ## Parse for script-name direct_value
                     case "${_opt_type}" in
                         *'nil'|*'none')
-                            _var_value="$(return_scrubbed_arg "${_user_opt}" "${_opt_type}")"
-                            _exit_status="${?}"
+                            local _var_value="$(return_scrubbed_arg "${_user_opt}" "${_opt_type}")"
+                            local _exit_status="${?}"
                         ;;
                     esac
                 ;;
