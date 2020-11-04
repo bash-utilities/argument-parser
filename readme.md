@@ -7,7 +7,7 @@
 This repository is intended as a `git submodule` for other Bash scripts that'd be _fancier_ if they'd parse arguments.
 
 
-------
+---
 
 
 #### Table of Contents
@@ -23,11 +23,13 @@ This repository is intended as a `git submodule` for other Bash scripts that'd b
   - [Utilize Argument Parser][heading__utilize_submodule]
   - [Commit and Push][heading__commit_and_push]
 
+- [&#x1F5D2; Notes][heading__notes]
+
 - [&#x2696; License][license]
 
 
+---
 
-------
 
 
 ## Requirements
@@ -248,8 +250,20 @@ EOF
 git push origin gh-pages
 ```
 
+______
 
-___
+
+
+## Notes
+[heading__notes]:
+  #notes
+  "&#x1F5D2; Additional things to keep in mind when developing"
+
+
+If upgrading from `v0.0.2` to `v0.0.3` then scrubber functions have been renamed! Eg. `arg_scrubber_regex` is now `argument_parser__scrub__regex` to avoid clobbering functions that maybe sourced within scripts making use of this project. This should **not** effect those only utilizing the `argument_parser` function.
+
+
+______
 
 
 
