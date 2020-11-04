@@ -24,26 +24,51 @@ _TRUE='1'
 _DEFAULT_ACCEPTABLE_ARG_LIST=('--help|-h:bool' '--foo|-f:print' '--path:path-nil')
 
 
+##
+# Removes characters that are not letters or numbers
+# @example
+#   arg_scrubber_alpha_numeric '0.1 foo^' "bar's"
+#   #> 01foobars
 arg_scrubber_alpha_numeric(){
     printf '%s' "${@//[^a-z0-9A-Z]/}"
 }
 
 
+##
+# Allows single dots, or dashes, and some punctuation
+# @example
+#   arg_scrubber_list "spam, 'flavored'" ham
+#   #> spam, 'flavored' ham
 arg_scrubber_list(){
     printf '%s' "$(sed 's@\.\.*@.@g; s@--*@-@g' <<<"${@//[^a-z0-9A-Z,+_./@:-]/}")"
 }
 
 
+##
+# Allows integer, or floating point, numbers ether signed or unsigned
+# @example
+#   arg_scrubber_number -99.88.33-77
+#   #> -99.88
 arg_scrubber_number(){
     printf '%s\n' "$(sed 's@\.\.*@.@g; s@--*@-@g' <<<"${@//[^0-9.-]/}")"
 }
 
 
+##
+# Allows path like strings
+# @example
+#   arg_scrubber_path '~/dir/file' 'name.ext'
+#   #> ~/dir/file name.ext
 arg_scrubber_path(){
     printf '%s' "$(sed 's@\.\.*@.@g; s@--*@-@g' <<<"${@//[^a-z0-9A-Z ~+_./@:-]/}")"
 }
 
 
+##
+# Removes most characters that are not posix compatible
+# @example
+#   arg_scrubber_posix '_$spam" "flavored_spam'
+#   #> spamflavored_spam
 arg_scrubber_posix(){
     local _value="${@//[^a-z0-9A-Z_.-]/}"
     _value="$(sed 's@^[-_.]@@g; s@[-_.]$@@g; s@\.\.*@.@g; s@--*@-@g' <<<"${_value}")"
@@ -51,11 +76,34 @@ arg_scrubber_posix(){
 }
 
 
+##
+# Allows most RegExp related characters
+# @example
+#   name regexp="$(arg_scrubber_regex '^([A-Z|0-9])[a-z]+$')"
+#   [[ 'Name' =~ ${name_regexp} ]] && {
+#       echo 'Totally proper'
+#   }
+#   #> Totally proper
+#
+#   [[ 'thing' =~ ${name_regexp} ]] || {
+#       echo 'Not a name'
+#   }
+#   #> Not a name
 arg_scrubber_regex(){
     printf '%s' "$(sed 's@.@\\.@g' <<<"${@//[^[:print:]$'\t'$'\n']/}")"
 }
 
 
+##
+# Parses value as type with scrubbers
+# @parameter {number | string} $1 _raw_value -
+# @parameter {string}          $2 _opt_type  -
+# @throws
+#   - STATUS -> 1
+#   - STDERR -> ## Error - return_scrubbed_arg detected differences in values
+# @example
+#   return_scrubbed_arg 'spam "flavored" ham' 'print'
+#   #> spam "flavored" ham
 return_scrubbed_arg(){
     local _raw_value="${1}"
     local _opt_type="${2:?## Error - no option type provided to return_scrubbed_arg}"
@@ -81,6 +129,32 @@ return_scrubbed_arg(){
 }
 
 
+##
+# Parses argument array references and assigns variables with scrubbed values
+# @parameter {ArrayRef} $1 _arg_user_ref   -
+# @parameter {ArrayRef} $2 _arg_accept_ref -
+# @example - script-name.sh
+#   #!/usr/bin/env bash
+#
+#   _passed_args=("${@:?No arguments provided}")
+#
+#   _acceptable_args=(
+#       '--help|-h:bool'
+#       '--directory:path'
+#       '--file:print-nil'
+#   )
+#
+#   argument_parser _passed_args _acceptable_args
+#
+#   printf '_help      -> %i\n' "${_help:-0}"
+#   printf '_directory -> %s\n' "${_directory}"
+#   printf '_file      -> %s\n' "${_file}"
+#
+# @example
+#   script-name.sh --directory some/where 'file-name.ext'
+#   #> _help      -> 0
+#   #> _directory -> some/where
+#   #> _file      -> file-name.ext
 argument_parser(){
     local -n _arg_user_ref="${1:?# No reference to an argument list/array provided}"
     local -n _arg_accept_ref="${2:-_DEFAULT_ACCEPTABLE_ARG_LIST}"
