@@ -2,7 +2,7 @@
 
 
 # argument-parser.sh, source it in other Bash scripts for argument parsing
-# Copyright (C) 2019  S0AndS0
+# Copyright (C) 2020  S0AndS0
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published
