@@ -86,53 +86,68 @@ argument_parser(){
     local -n _arg_accept_ref="${2:-_DEFAULT_ACCEPTABLE_ARG_LIST}"
     local _args_user_list=( "${_arg_user_ref[@]}" )
     unset _assigned_args
-    for _acceptable_args in ${_arg_accept_ref[@]}; do
+
+    local _acceptable_arg
+    local _opt_name
+    local _var_name
+    local _opt_type
+    local _arg_opt_list
+    local _valid_opts_pattern
+    local _valid_opts_pattern_alt
+    local _args_user_list_index
+    local _user_opt
+    local _var_value
+    local _exit_status
+
+    local _arg_accept_ref_index
+    for _arg_accept_ref_index in "${!_arg_accept_ref[@]}"; do
+        _acceptable_arg="${_arg_accept_ref[${_arg_accept_ref_index}]}"
         ## Take a break when user supplied argument list becomes empty
         [[ "${#_args_user_list[@]}" == '0' ]] && break
         ## First in listed acceptable arg is used as variable name to save value to
         ##  example, '--foo-bar fizz' would transmute into '_foo_bar=fizz'
-        local _opt_name="${_acceptable_args%%[:|]*}"
-        local _var_name="${_opt_name#*[-]}"
+        _opt_name="${_acceptable_arg%%[:|]*}"
+        _var_name="${_opt_name#*[-]}"
         _var_name="${_var_name#*[-]}"
         _var_name="_${_var_name//-/_}"
         ## Divine the type of argument allowed for this iteration of acceptable args
-        case "${_acceptable_args}" in
-            *':'*) local _opt_type="${_acceptable_args##*[:]}" ;;
-            *)     local _opt_type="bool"                      ;;
+        case "${_acceptable_arg}" in
+            *':'*) _opt_type="${_acceptable_arg##*[:]}" ;;
+            *)     _opt_type="bool"                      ;;
         esac
         ## Set case expressions to match user arguments against and for non-bool type
         ##  what alternative case expression to match on.
         ##  example '--foo|-f' will also check for '--foo=*|-f=*'
-        local _arg_opt_list="${_acceptable_args%%:*}"
-        local _valid_opts_pattern="@(${_arg_opt_list})"
+        _arg_opt_list="${_acceptable_arg%%:*}"
+        _valid_opts_pattern="@(${_arg_opt_list})"
         case "${_arg_opt_list}" in
-            *'|'*) local _valid_opts_pattern_alt="@(${_arg_opt_list//|/=*|}=*)" ;;
-            *)     local _valid_opts_pattern_alt="@(${_arg_opt_list}=*)"        ;;
+            *'|'*) _valid_opts_pattern_alt="@(${_arg_opt_list//|/=*|}=*)" ;;
+            *)     _valid_opts_pattern_alt="@(${_arg_opt_list}=*)"        ;;
         esac
         ## Attempt to match up user supplied arguments with those that are valid
-        for (( i = 0; i < "${#_args_user_list[@]}"; i++ )); do
-            local _user_opt="${_args_user_list[${i}]}"
+        for _args_user_list_index in "${!_args_user_list[@]}"; do
+            _user_opt="${_args_user_list[${_args_user_list_index}]}"
             case "${_user_opt}" in
                 ${_valid_opts_pattern})     ## Parse for script-name --foo bar or --true
                     if [[ "${_opt_type}" =~ ^'bool'* ]]; then
-                        local _var_value="$(return_scrubbed_arg "${_user_opt}" "${_opt_type}")"
-                        local _exit_status="${?}"
+                        _var_value="$(return_scrubbed_arg "${_user_opt}" "${_opt_type}")"
+                        _exit_status="${?}"
                     else
-                        i+=1
-                        local _var_value="$(return_scrubbed_arg "${_args_user_list[${i}]}" "${_opt_type}")"
-                        local _exit_status="${?}"
-                        unset _args_user_list[$(( i - 1 ))]
+                        (( _args_user_list_index++ )) || { true; }
+                        _var_value="$(return_scrubbed_arg "${_args_user_list[${_args_user_list_index}]}" "${_opt_type}")"
+                        _exit_status="${?}"
+                        unset _args_user_list[$(( _args_user_list_index - 1 ))]
                     fi
                 ;;
                 ${_valid_opts_pattern_alt}) ## Parse for script-name --foo=bar
-                    local _var_value="$(return_scrubbed_arg "${_user_opt#*=}" "${_opt_type}")"
-                    local _exit_status="${?}"
+                    _var_value="$(return_scrubbed_arg "${_user_opt#*=}" "${_opt_type}")"
+                    _exit_status="${?}"
                 ;;
                 *)                          ## Parse for script-name direct_value
                     case "${_opt_type}" in
                         *'nil'|*'none')
-                            local _var_value="$(return_scrubbed_arg "${_user_opt}" "${_opt_type}")"
-                            local _exit_status="${?}"
+                            _var_value="$(return_scrubbed_arg "${_user_opt}" "${_opt_type}")"
+                            _exit_status="${?}"
                         ;;
                     esac
                 ;;
@@ -147,7 +162,7 @@ argument_parser(){
                 declare -ag "_assigned_args+=('${_opt_name}=\"${_var_value}\"')"
                 unset _user_opt
                 unset _var_value
-                unset _args_user_list[${i}]
+                unset _args_user_list[${_args_user_list_index}]
                 unset _exit_status
                 _args_user_list=("${_args_user_list[@]}")
                 break
