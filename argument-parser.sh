@@ -50,7 +50,22 @@ arg_scrubber_list(){
 #   arg_scrubber_number -99.88.33-77
 #   #> -99.88
 arg_scrubber_number(){
-    printf '%s\n' "$(sed 's@\.\.*@.@g; s@--*@-@g' <<<"${@//[^0-9.-]/}")"
+    local _value="$(sed '{
+        s@\.\.*@.@g;
+        s@--*@-@g;
+    }' <<<"${@//[^0-9.-]/}")"
+
+    local _value_only_periods="${_value//[^.]/}"
+    [[ "${#_value_only_periods}" -gt 1 ]] && {
+        _value="${_value%.*}"
+    }
+
+    local _value_only_dashes="${_value//[^-]/}"
+    [[ "${#_value_only_dashes}" -gt 1 ]] && {
+        _value="${_value%-*}"
+    }
+
+    printf '%s' "${_value}"
 }
 
 
