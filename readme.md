@@ -33,7 +33,7 @@ This repository is intended as a `git submodule` for other Bash scripts that'd b
 ## Requirements
 
 
-Bash version 4 or greater and the following command line utilities;
+Bash version `4.4` or greater and the following command line utilities;
 
 
 - `printf` for _returning_ values between functions
@@ -180,7 +180,7 @@ Available argument parsing _types_ are
 
 - `:print` sets passed value minus any _non-`[:print:]`-able_ characters
 
-- `:regex` similar to `:print`, but also allows for tabs (`\t`) at the beginning and new lines (`\n`) at the end of the passed value, and attempts to escape any periods (`.`) with a back-slash (`\`)
+- `:regex` similar to `:print`, but also allows for tabs (`\t`) at the beginning and new lines (`\n`) at the end of the passed value
 
 - `:list` _scrubs_ leading duplicated `..` and/or `--` from passed value and sets anything alphanumeric and; `,`, `+`, `_`, `.`, `@`, `:`, `-` characters if any from passed value
 
@@ -261,7 +261,7 @@ ___
 
 ```
 Argument Parser documentation from Bash Utilities
-Copyright (C) 2019  S0AndS0
+Copyright (C) 2020  S0AndS0
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
