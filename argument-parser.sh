@@ -148,7 +148,7 @@ return_scrubbed_arg(){
     if [[ "${_opt_type}" =~ ^'bool'* ]] || [[ "${_raw_value}" == "${_value}" ]]; then
         printf '%s' "${_value}"
     else
-        printf '## Error - return_scrubbed_arg detected differences in values\n' >&2
+        printf >&2 '## Error - return_scrubbed_arg detected differences in values\n' >&2
         return 1
     fi
 }
