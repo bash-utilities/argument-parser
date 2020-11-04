@@ -103,7 +103,7 @@ argument_parser(){
     for _arg_accept_ref_index in "${!_arg_accept_ref[@]}"; do
         _acceptable_arg="${_arg_accept_ref[${_arg_accept_ref_index}]}"
         ## Take a break when user supplied argument list becomes empty
-        [[ "${#_args_user_list[@]}" == '0' ]] && break
+        (( ${#_args_user_list[@]} )) || { break; }
         ## First in listed acceptable arg is used as variable name to save value to
         ##  example, '--foo-bar fizz' would transmute into '_foo_bar=fizz'
         _opt_name="${_acceptable_arg%%[:|]*}"
@@ -113,8 +113,9 @@ argument_parser(){
         ## Divine the type of argument allowed for this iteration of acceptable args
         case "${_acceptable_arg}" in
             *':'*) _opt_type="${_acceptable_arg##*[:]}" ;;
-            *)     _opt_type="bool"                      ;;
+            *)     _opt_type='bool'                     ;;
         esac
+
         ## Set case expressions to match user arguments against and for non-bool type
         ##  what alternative case expression to match on.
         ##  example '--foo|-f' will also check for '--foo=*|-f=*'
@@ -124,6 +125,7 @@ argument_parser(){
             *'|'*) _valid_opts_pattern_alt="@(${_arg_opt_list//|/=*|}=*)" ;;
             *)     _valid_opts_pattern_alt="@(${_arg_opt_list}=*)"        ;;
         esac
+
         ## Attempt to match up user supplied arguments with those that are valid
         for _args_user_list_index in "${!_args_user_list[@]}"; do
             _user_opt="${_args_user_list[${_args_user_list_index}]}"
@@ -152,19 +154,20 @@ argument_parser(){
                     esac
                 ;;
             esac
-            if ((_exit_status)); then return ${_exit_status}; fi
+            (( _exit_status )) && { return ${_exit_status}; }
+
             ## Break on matched options after clearing temp variables and re-assigning
             ##  list (array) of user supplied arguments.
             ## Note, re-assigning is to ensure the next looping indexes correctly
             ##  and is designed to require less work on each iteration
-            if [ -n "${_var_value}" ]; then
+            if (( ${#_var_value} )); then
                 declare -g "${_var_name}=${_var_value}"
-                declare -ag "_assigned_args+=('${_opt_name}=\"${_var_value}\"')"
+                declare -ag "_assigned_args+=( '${_opt_name}=\"${_var_value}\"' )"
                 unset _user_opt
                 unset _var_value
                 unset _args_user_list[${_args_user_list_index}]
                 unset _exit_status
-                _args_user_list=("${_args_user_list[@]}")
+                _args_user_list=( "${_args_user_list[@]}" )
                 break
             fi
         done
