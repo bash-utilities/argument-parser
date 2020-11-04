@@ -40,7 +40,10 @@ arg_scrubber_alpha_numeric(){
 #   arg_scrubber_list "spam, 'flavored'" ham
 #   #> spam, 'flavored' ham
 arg_scrubber_list(){
-    printf '%s' "$(sed 's@\.\.*@.@g; s@--*@-@g' <<<"${@//[^a-z0-9A-Z,+_./@:-]/}")"
+    printf '%s' "$(sed '{
+        s@\.\.*@.@g;
+        s@--*@-@g;
+    }' <<<"${@//[^a-z0-9A-Z,+_./@:-]/}")"
 }
 
 
@@ -75,7 +78,10 @@ arg_scrubber_number(){
 #   arg_scrubber_path '~/dir/file' 'name.ext'
 #   #> ~/dir/file name.ext
 arg_scrubber_path(){
-    printf '%s' "$(sed 's@\.\.*@.@g; s@--*@-@g' <<<"${@//[^a-z0-9A-Z ~+_./@:-]/}")"
+    printf '%s' "$(sed '{
+        s@\.\.*@.@g;
+        s@--*@-@g;
+    }' <<<"${@//[^a-z0-9A-Z ~+_./@:-]/}")"
 }
 
 
@@ -85,8 +91,12 @@ arg_scrubber_path(){
 #   arg_scrubber_posix '_$spam" "flavored_spam'
 #   #> spamflavored_spam
 arg_scrubber_posix(){
-    local _value="${@//[^a-z0-9A-Z_.-]/}"
-    _value="$(sed 's@^[-_.]@@g; s@[-_.]$@@g; s@\.\.*@.@g; s@--*@-@g' <<<"${_value}")"
+    local _value="$(sed '{
+        s@^[-_.]@@g;
+        s@[-_.]$@@g;
+        s@\.\.*@.@g;
+        s@--*@-@g;
+    }' <<<"${@//[^a-z0-9A-Z_.-]/}")"
     printf '%s' "${_value::32}"
 }
 
@@ -105,7 +115,7 @@ arg_scrubber_posix(){
 #   }
 #   #> Not a name
 arg_scrubber_regex(){
-    printf '%s' "$(sed 's@.@\\.@g' <<<"${@//[^[:print:]$'\t'$'\n']/}")"
+    printf '%s' "${@//[^[:print:]$'\t'$'\n']/}"
 }
 
 
