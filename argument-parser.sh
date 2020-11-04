@@ -184,7 +184,6 @@ argument_parser(){
     local -n _arg_user_ref="${1:?# No reference to an argument list/array provided}"
     local -n _arg_accept_ref="${2:-_DEFAULT_ACCEPTABLE_ARG_LIST}"
     local _args_user_list=( "${_arg_user_ref[@]}" )
-    unset _assigned_args
 
     local _acceptable_arg
     local _opt_name
