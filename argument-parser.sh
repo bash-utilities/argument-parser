@@ -135,13 +135,13 @@ return_scrubbed_arg(){
     local _value
     case "${_opt_type}" in
         'alpha_numeric'*) _value="$(argument_parser__scrub__alpha_numeric "${_raw_value}")" ;;
-        'bool'*)          _value="${_TRUE}"                                      ;;
+        'bool'*)          _value="${_TRUE}"                                                 ;;
         'list'*)          _value="$(argument_parser__scrub__list "${_raw_value}")"          ;;
         'number'*)        _value="$(argument_parser__scrub__number "${_raw_value}")"        ;;
         'path'*)          _value="$(argument_parser__scrub__path "${_raw_value}")"          ;;
         'posix'*)         _value="$(argument_parser__scrub__posix "${_raw_value}")"         ;;
-        'print'*)         _value="${_raw_value//[^[:print:]]/}"                  ;;
-        'raw'*)           _value="${_raw_value}"                                 ;;
+        'print'*)         _value="${_raw_value//[^[:print:]]/}"                             ;;
+        'raw'*)           _value="${_raw_value}"                                            ;;
         'regex'*)         _value="$(argument_parser__scrub__regex "${_raw_value}")"         ;;
     esac
 
