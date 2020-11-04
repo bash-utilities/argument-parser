@@ -27,9 +27,9 @@ _DEFAULT_ACCEPTABLE_ARG_LIST=('--help|-h:bool' '--foo|-f:print' '--path:path-nil
 ##
 # Removes characters that are not letters or numbers
 # @example
-#   arg_scrubber_alpha_numeric '0.1 foo^' "bar's"
+#   argument_parser__scrub__alpha_numeric '0.1 foo^' "bar's"
 #   #> 01foobars
-arg_scrubber_alpha_numeric(){
+argument_parser__scrub__alpha_numeric(){
     printf '%s' "${@//[^a-z0-9A-Z]/}"
 }
 
@@ -37,9 +37,9 @@ arg_scrubber_alpha_numeric(){
 ##
 # Allows single dots, or dashes, and some punctuation
 # @example
-#   arg_scrubber_list "spam, 'flavored'" ham
+#   argument_parser__scrub__list "spam, 'flavored'" ham
 #   #> spam, 'flavored' ham
-arg_scrubber_list(){
+argument_parser__scrub__list(){
     printf '%s' "$(sed '{
         s@\.\.*@.@g;
         s@--*@-@g;
@@ -50,9 +50,9 @@ arg_scrubber_list(){
 ##
 # Allows integer, or floating point, numbers ether signed or unsigned
 # @example
-#   arg_scrubber_number -99.88.33-77
+#   argument_parser__scrub__number -99.88.33-77
 #   #> -99.88
-arg_scrubber_number(){
+argument_parser__scrub__number(){
     local _value="$(sed '{
         s@\.\.*@.@g;
         s@--*@-@g;
@@ -75,9 +75,9 @@ arg_scrubber_number(){
 ##
 # Allows path like strings
 # @example
-#   arg_scrubber_path '~/dir/file' 'name.ext'
+#   argument_parser__scrub__path '~/dir/file' 'name.ext'
 #   #> ~/dir/file name.ext
-arg_scrubber_path(){
+argument_parser__scrub__path(){
     printf '%s' "$(sed '{
         s@\.\.*@.@g;
         s@--*@-@g;
@@ -88,9 +88,9 @@ arg_scrubber_path(){
 ##
 # Removes most characters that are not posix compatible
 # @example
-#   arg_scrubber_posix '_$spam" "flavored_spam'
+#   argument_parser__scrub__posix '_$spam" "flavored_spam'
 #   #> spamflavored_spam
-arg_scrubber_posix(){
+argument_parser__scrub__posix(){
     local _value="$(sed '{
         s@^[-_.]@@g;
         s@[-_.]$@@g;
@@ -104,7 +104,7 @@ arg_scrubber_posix(){
 ##
 # Allows most RegExp related characters
 # @example
-#   name regexp="$(arg_scrubber_regex '^([A-Z|0-9])[a-z]+$')"
+#   name regexp="$(argument_parser__scrub__regex '^([A-Z|0-9])[a-z]+$')"
 #   [[ 'Name' =~ ${name_regexp} ]] && {
 #       echo 'Totally proper'
 #   }
@@ -114,7 +114,7 @@ arg_scrubber_posix(){
 #       echo 'Not a name'
 #   }
 #   #> Not a name
-arg_scrubber_regex(){
+argument_parser__scrub__regex(){
     printf '%s' "${@//[^[:print:]$'\t'$'\n']/}"
 }
 
@@ -134,15 +134,15 @@ return_scrubbed_arg(){
     local _opt_type="${2:?## Error - no option type provided to return_scrubbed_arg}"
     local _value
     case "${_opt_type}" in
-        'alpha_numeric'*) _value="$(arg_scrubber_alpha_numeric "${_raw_value}")" ;;
+        'alpha_numeric'*) _value="$(argument_parser__scrub__alpha_numeric "${_raw_value}")" ;;
         'bool'*)          _value="${_TRUE}"                                      ;;
-        'list'*)          _value="$(arg_scrubber_list "${_raw_value}")"          ;;
-        'number'*)        _value="$(arg_scrubber_number "${_raw_value}")"        ;;
-        'path'*)          _value="$(arg_scrubber_path "${_raw_value}")"          ;;
-        'posix'*)         _value="$(arg_scrubber_posix "${_raw_value}")"         ;;
+        'list'*)          _value="$(argument_parser__scrub__list "${_raw_value}")"          ;;
+        'number'*)        _value="$(argument_parser__scrub__number "${_raw_value}")"        ;;
+        'path'*)          _value="$(argument_parser__scrub__path "${_raw_value}")"          ;;
+        'posix'*)         _value="$(argument_parser__scrub__posix "${_raw_value}")"         ;;
         'print'*)         _value="${_raw_value//[^[:print:]]/}"                  ;;
         'raw'*)           _value="${_raw_value}"                                 ;;
-        'regex'*)         _value="$(arg_scrubber_regex "${_raw_value}")"         ;;
+        'regex'*)         _value="$(argument_parser__scrub__regex "${_raw_value}")"         ;;
     esac
 
     if [[ "${_opt_type}" =~ ^'bool'* ]] || [[ "${_raw_value}" == "${_value}" ]]; then
