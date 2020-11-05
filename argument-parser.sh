@@ -183,7 +183,7 @@ return_scrubbed_arg(){
 argument_parser(){
     local -n _arg_user_ref="${1:?# No reference to an argument list/array provided}"
     local -n _arg_accept_ref="${2:-_DEFAULT_ACCEPTABLE_ARG_LIST}"
-    local _args_user_list=( "${_arg_user_ref[@]}" )
+    local -a _args_user_list=( "${_arg_user_ref[@]}" )
 
     local _acceptable_arg
     local _opt_name
@@ -274,6 +274,7 @@ argument_parser(){
         unset _var_name
     done
 }
+
 
 #
 #    Inspiration &/or information sources
