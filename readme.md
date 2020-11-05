@@ -46,8 +46,6 @@ Bash version `4.4` or greater and the following command line utilities;
 
 - `local` with `-n` option available for passing references to variables between functions
 
-- `shopt` with `-s extglob` available for extending what Bash `case` statements are allowed to expand.
-
 
 > See `info printf` and `info sed` for documentation and `help declare` and `help local` for more information on additional options.
 
