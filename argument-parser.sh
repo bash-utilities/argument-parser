@@ -17,9 +17,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-shopt -s extglob
-
-
 _TRUE='1'
 _DEFAULT_ACCEPTABLE_ARG_LIST=('--help|-h:bool' '--foo|-f:print' '--path:path-nil')
 
@@ -189,7 +186,6 @@ argument_parser(){
     local _opt_name
     local _var_name
     local _opt_type
-    local _arg_opt_list
     local _valid_opts_pattern
     local _valid_opts_pattern_alt
     local _args_user_list_index
@@ -217,41 +213,31 @@ argument_parser(){
         ## Set case expressions to match user arguments against and for non-bool type
         ##  what alternative case expression to match on.
         ##  example '--foo|-f' will also check for '--foo=*|-f=*'
-        _arg_opt_list="${_acceptable_arg%%:*}"
-        _valid_opts_pattern="@(${_arg_opt_list})"
-        case "${_arg_opt_list}" in
-            *'|'*) _valid_opts_pattern_alt="@(${_arg_opt_list//|/=*|}=*)" ;;
-            *)     _valid_opts_pattern_alt="@(${_arg_opt_list}=*)"        ;;
-        esac
+        _acceptable_pattern="${_acceptable_arg%%:*}"
 
         ## Attempt to match up user supplied arguments with those that are valid
         for _args_user_list_index in "${!_args_user_list[@]}"; do
             _user_opt="${_args_user_list[${_args_user_list_index}]}"
-            case "${_user_opt}" in
-                ${_valid_opts_pattern})     ## Parse for script-name --foo bar or --true
-                    if [[ "${_opt_type}" =~ ^'bool'* ]]; then
-                        _var_value="$(return_scrubbed_arg "${_user_opt}" "${_opt_type}")"
-                        _exit_status="${?}"
-                    else
-                        (( _args_user_list_index++ )) || { true; }
-                        _var_value="$(return_scrubbed_arg "${_args_user_list[${_args_user_list_index}]}" "${_opt_type}")"
-                        _exit_status="${?}"
-                        unset _args_user_list[$(( _args_user_list_index - 1 ))]
-                    fi
-                ;;
-                ${_valid_opts_pattern_alt}) ## Parse for script-name --foo=bar
-                    _var_value="$(return_scrubbed_arg "${_user_opt#*=}" "${_opt_type}")"
+            if [[ "${_user_opt}" =~ ^(${_acceptable_pattern})$ ]]; then
+                ## Parse for script-name --foo bar or --true
+                if [[ "${_opt_type}" =~ ^'bool'* ]]; then
+                    _var_value="$(return_scrubbed_arg "${_user_opt}" "${_opt_type}")"
                     _exit_status="${?}"
-                ;;
-                *)                          ## Parse for script-name direct_value
-                    case "${_opt_type}" in
-                        *'nil'|*'none')
-                            _var_value="$(return_scrubbed_arg "${_user_opt}" "${_opt_type}")"
-                            _exit_status="${?}"
-                        ;;
-                    esac
-                ;;
-            esac
+                else
+                    (( _args_user_list_index++ )) || { true; }
+                    _var_value="$(return_scrubbed_arg "${_args_user_list[${_args_user_list_index}]}" "${_opt_type}")"
+                    _exit_status="${?}"
+                    unset _args_user_list[$(( _args_user_list_index - 1 ))]
+                fi
+            elif [[ "${_user_opt}" =~ ^(${_acceptable_pattern})=[[:print:]]*$ ]]; then
+                ## Parse for script-name --foo=bar
+                _var_value="$(return_scrubbed_arg "${_user_opt#*=}" "${_opt_type}")"
+                _exit_status="${?}"
+            elif [[ "${_opt_type}" =~ [[:print:]]*(nil|none)$ ]]; then
+                ## Parse for script-name direct_value
+                _var_value="$(return_scrubbed_arg "${_user_opt}" "${_opt_type}")"
+                _exit_status="${?}"
+            fi
             (( _exit_status )) && { return ${_exit_status}; }
 
             ## Break on matched options after clearing temp variables and re-assigning
