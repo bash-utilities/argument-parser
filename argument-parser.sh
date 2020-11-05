@@ -50,7 +50,8 @@ argument_parser__scrub__list(){
 #   argument_parser__scrub__number -99.88.33-77
 #   #> -99.88
 argument_parser__scrub__number(){
-    local _value="$(sed '{
+    local _value
+    _value="$(sed '{
         s@\.\.*@.@g;
         s@--*@-@g;
     }' <<<"${@//[^0-9.-]/}")"
@@ -88,7 +89,8 @@ argument_parser__scrub__path(){
 #   argument_parser__scrub__posix '_$spam" "flavored_spam'
 #   #> spamflavored_spam
 argument_parser__scrub__posix(){
-    local _value="$(sed '{
+    local _value
+    _value="$(sed '{
         s@^[-_.]@@g;
         s@[-_.]$@@g;
         s@\.\.*@.@g;
@@ -186,8 +188,6 @@ argument_parser(){
     local _opt_name
     local _var_name
     local _opt_type
-    local _valid_opts_pattern
-    local _valid_opts_pattern_alt
     local _args_user_list_index
     local _user_opt
     local _var_value
