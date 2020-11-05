@@ -124,13 +124,13 @@ argument_parser__scrub__regex(){
 # @parameter {string}          $2 _opt_type  -
 # @throws
 #   - STATUS -> 1
-#   - STDERR -> ## Error - return_scrubbed_arg detected differences in values
+#   - STDERR -> ## Error - argument_parser__scrub_by_type detected differences in values
 # @example
-#   return_scrubbed_arg 'spam "flavored" ham' 'print'
+#   argument_parser__scrub_by_type 'spam "flavored" ham' 'print'
 #   #> spam "flavored" ham
-return_scrubbed_arg(){
+argument_parser__scrub_by_type(){
     local _raw_value="${1}"
-    local _opt_type="${2:?## Error - no option type provided to return_scrubbed_arg}"
+    local _opt_type="${2:?## Error - no option type provided to argument_parser__scrub_by_type}"
     local _value
     case "${_opt_type}" in
         'alpha_numeric'*) _value="$(argument_parser__scrub__alpha_numeric "${_raw_value}")" ;;
@@ -147,7 +147,7 @@ return_scrubbed_arg(){
     if [[ "${_opt_type}" =~ ^'bool'* ]] || [[ "${_raw_value}" == "${_value}" ]]; then
         printf '%s' "${_value}"
     else
-        printf >&2 '## Error - return_scrubbed_arg detected differences in values\n'
+        printf >&2 '## Error - argument_parser__scrub_by_type detected differences in values\n'
         return 1
     fi
 }
@@ -223,21 +223,21 @@ argument_parser(){
             if [[ "${_user_opt}" =~ ^(${_acceptable_pattern})$ ]]; then
                 ## Parse for script-name --foo bar or --true
                 if [[ "${_opt_type}" =~ ^'bool'* ]]; then
-                    _var_value="$(return_scrubbed_arg "${_user_opt}" "${_opt_type}")"
+                    _var_value="$(argument_parser__scrub_by_type "${_user_opt}" "${_opt_type}")"
                     _exit_status="${?}"
                 else
                     (( _args_user_list_index++ )) || { true; }
-                    _var_value="$(return_scrubbed_arg "${_args_user_list[${_args_user_list_index}]}" "${_opt_type}")"
+                    _var_value="$(argument_parser__scrub_by_type "${_args_user_list[${_args_user_list_index}]}" "${_opt_type}")"
                     _exit_status="${?}"
                     unset _args_user_list[$(( _args_user_list_index - 1 ))]
                 fi
             elif [[ "${_user_opt}" =~ ^(${_acceptable_pattern})=[[:print:]]*$ ]]; then
                 ## Parse for script-name --foo=bar
-                _var_value="$(return_scrubbed_arg "${_user_opt#*=}" "${_opt_type}")"
+                _var_value="$(argument_parser__scrub_by_type "${_user_opt#*=}" "${_opt_type}")"
                 _exit_status="${?}"
             elif [[ "${_opt_type}" =~ [[:print:]]*(nil|none)$ ]]; then
                 ## Parse for script-name direct_value
-                _var_value="$(return_scrubbed_arg "${_user_opt}" "${_opt_type}")"
+                _var_value="$(argument_parser__scrub_by_type "${_user_opt}" "${_opt_type}")"
                 _exit_status="${?}"
             fi
             (( _exit_status )) && { return ${_exit_status}; }
