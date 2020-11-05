@@ -260,7 +260,7 @@ argument_parser(){
             ##  and is designed to require less work on each iteration
             if (( ${#_var_value} )); then
                 declare -g "${_var_name}=${_var_value}"
-                declare -ag "_assigned_args+=( '${_opt_name}=\"${_var_value}\"' )"
+                declare -ag "_assigned_args+=( '${_opt_name}=${_var_value}' )"
                 unset _user_opt
                 unset _var_value
                 unset _args_user_list[${_args_user_list_index}]
