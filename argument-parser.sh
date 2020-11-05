@@ -147,7 +147,7 @@ argument_parser__scrub_by_type(){
     if [[ "${_opt_type}" =~ ^'bool'* ]] || [[ "${_raw_value}" == "${_value}" ]]; then
         printf '%s' "${_value}"
     else
-        printf >&2 '## Error - argument_parser__scrub_by_type detected differences in values\n'
+        printf >&2 '## %s error -> detected differences in values\n' "${FUNCNAME[0]}"
         return 1
     fi
 }
