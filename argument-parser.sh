@@ -214,6 +214,10 @@ argument_parser(){
         ##  what alternative case expression to match on.
         ##  example '--foo|-f' will also check for '--foo=*|-f=*'
         _acceptable_pattern="${_acceptable_arg%%:*}"
+        if ! (( ${#_acceptable_pattern} )); then
+            printf >&2 '%s error -> cannot parse acceptable pattern from %s\n' "${FUNCNAME[0]}" "${_acceptable_arg}"
+            return 1
+        fi
 
         ## Attempt to match up user supplied arguments with those that are valid
         for _args_user_list_index in "${!_args_user_list[@]}"; do
