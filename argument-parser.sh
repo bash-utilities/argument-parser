@@ -205,10 +205,8 @@ argument_parser(){
         _var_name="${_var_name#*[-]}"
         _var_name="_${_var_name//-/_}"
         ## Divine the type of argument allowed for this iteration of acceptable args
-        case "${_acceptable_arg}" in
-            *':'*) _opt_type="${_acceptable_arg##*[:]}" ;;
-            *)     _opt_type='bool'                     ;;
-        esac
+        _opt_type="${_acceptable_arg##*[:]}"
+        _opt_type="${_opt_type:-bool}"
 
         ## Set case expressions to match user arguments against and for non-bool type
         ##  what alternative case expression to match on.
