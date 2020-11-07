@@ -17,8 +17,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-_TRUE='1'
-_DEFAULT_ACCEPTABLE_ARG_LIST=('--help|-h:bool' '--foo|-f:print' '--path:path-nil')
+# shellcheck disable=SC2034
+{
+    _TRUE='1'
+    _DEFAULT_ACCEPTABLE_ARG_LIST=('--help|-h:bool' '--foo|-f:print' '--path:path-nil')
+}
 
 
 ##
