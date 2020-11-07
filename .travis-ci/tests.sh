@@ -30,15 +30,14 @@ source "${__DIR__}/features/print.sh"
 # shellcheck source=.travis-ci/features/regexp.sh
 source "${__DIR__}/features/regexp.sh"
 
-# echo "__DIR__ -> ${__DIR__}"
-# echo "__PARENT_DIR__ -> ${__PARENT_DIR__}"
-
 
 ##
 #
 test_function() {
     local _function_name="${1:?No function_name name provided}"
-    "${_function_name}" || {
+    local -a _function_arguments=( "${@}" )
+    unset "_function_arguments[0]"
+    "${_function_name}" "${_function_arguments[@]}" || {
         local _status="${?}"
         printf 'Failed -> %s\n' "${_function_name}"
         return "${_status}"
